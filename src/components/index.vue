@@ -35,7 +35,7 @@
     </div>
     <!-- player tag -->
     <div class="player">
-      <audio controls></audio>
+      <audio controls :src="musicUrl" autoplay></audio>
     </div>
   </div>
 </template>
@@ -43,12 +43,10 @@
 <script>
 export default {
   name: 'index',
-  created() {
-    
-  },
   data() {
     return {
-      activeIndex: 0
+      activeIndex: 0,
+      musicUrl: "",
     };
   }
 };
