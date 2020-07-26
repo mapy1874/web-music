@@ -299,7 +299,11 @@
 
 <script>
 export default {
-  name: 'discovery'
+  name: 'discovery',
+  created() {
+    
+  },
+
 };
 </script>
 

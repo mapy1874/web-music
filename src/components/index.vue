@@ -1,5 +1,6 @@
 <template>
   <div class="index-container">
+    <!-- navigation -->
     <div class="nav" >
       <ul>
         <li>
@@ -28,9 +29,11 @@
         </li>
       </ul>
     </div>
+    <!-- body part -->
     <div class="main">
       <router-view></router-view>
     </div>
+    <!-- player tag -->
     <div class="player">
       <audio controls></audio>
     </div>
@@ -40,6 +43,9 @@
 <script>
 export default {
   name: 'index',
+  created() {
+    
+  },
   data() {
     return {
       activeIndex: 0
