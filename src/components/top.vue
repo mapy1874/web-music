@@ -12,9 +12,20 @@
       </div>
     </div>
     <div class="right-box">
-      <el-input size="small" placeholder="搜索" v-model="query">
-        <i slot="prefix" class="el-input__icon el-icon-search"></i>
-      </el-input>
+      <div class="el-input el-input--small el-input--prefix">
+        <!-- search bar --> 
+        <input 
+          type="text"
+          autocomplete="off"
+          placeholder="搜索"
+          class="el-input__inner"
+          v-model="query"
+          @keyup.enter="toResult"
+        />
+        <span class="el-input__prefix">
+          <i class="el-input__icon el-icon-search"></i>
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -24,8 +35,19 @@ export default {
   name: 'top',
   data(){
     return {
+      // input content
       query:''
     }
+  },
+  methods: {
+    toResult() {
+      if (this.query=='') {
+        this.$message.warning('请输入内容');
+      } else {
+        // go to the result pag
+        this.$router.push('/result?q='+this.query);
+      }
+    },
   }
 };
 </script>

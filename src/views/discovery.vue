@@ -72,7 +72,7 @@ export default {
   name: 'discovery',
   data() {
     return({
-      banner: [],
+      banners: [],
       list: [],
       songs: [],
       mvs: [],
@@ -130,7 +130,7 @@ export default {
       }).then(resp => {
         let url = resp.data.data[0].url;
         this.$parent.musicUrl =  url;
-      })
+      });
     },
   }
 
