@@ -43,7 +43,7 @@
       </el-tab-pane>
       <el-tab-pane label="歌单" name="lists">
         <div class="items">
-          <div class="item" v-for="(item, index) in playlists" :key="index">
+          <div class="item" v-for="(item, index) in playlists" :key="index" @click="toPlaylist(item.id)">
             <div class="img-wrap">
               <div class="num-wrap">
                 播放量:
@@ -217,7 +217,10 @@ export default {
         let url = resp.data.data[0].url;
         this.$parent.musicUrl =  url;
       });
-    }
+    },
+    toPlaylist(id){
+      this.$router.push('/playlist?q='+id);
+    },
   }
 };
 </script>
