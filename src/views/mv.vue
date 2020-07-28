@@ -6,34 +6,23 @@
       <div class="video-wrap">
         <video
           controls
-          src="https://nie.v.netease.com/r/video/20180531/44f868de-deef-4409-8325-3bb3b5567f2c.mp4"
+          :src="url"
         ></video>
       </div>
       <!-- mv信息 -->
       <div class="info-wrap">
         <div class="singer-info">
           <div class="avatar-wrap">
-            <img src="../assets/avatar.jpg" alt="" />
+            <img :src="icon" alt="" />
           </div>
-          <span class="name">TF Boys</span>
+          <span class="name">{{mvInfo.artistName}}</span>
         </div>
         <div class="mv-info">
-          <h2 class="title">TF BOYS LIVE 秀 王源《淘汰》</h2>
+          <h2 class="title">{{mvInfo.name}}</h2>
           <span class="date">发布：2014-11-04</span>
-          <span class="number">播放：94526次</span>
+          <span class="number">播放：{{mvInfo.playCount}}次</span>
           <p class="desc">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-            Consequuntur saepe aut officia itaque exercitationem culpa facere
-            doloremque voluptates id non nam, aliquid ipsum laborum odit
-            accusantium dolorem eligendi veniam dolore ea aperiam labore
-            cupiditate et a. Necessitatibus eaque blanditiis possimus nobis
-            ullam reprehenderit animi, vero reiciendis eos, deleniti commodi,
-            consequatur dolorem iusto. Assumenda doloribus soluta temporibus ut
-            dolorum corporis quos! Quisquam consectetur dolore iste quo
-            praesentium dolorum excepturi, at sapiente pariatur quis! Neque ex
-            cum, nobis aspernatur temporibus, voluptates at obcaecati dolore est
-            repudiandae, veniam laborum fuga corrupti illum ut. Ad a tempore
-            sint adipisci vero, delectus ducimus debitis molestias!
+            {{mvInfo.desc}}
           </p>
         </div>
       </div>
@@ -129,19 +118,19 @@
       <h3 class="title">相关推荐</h3>
       <div class="mvs">
         <div class="items">
-          <div class="item">
+          <div class="item" v-for="(item, index) in simiMVs" :key="index">
             <div class="img-wrap">
-              <img src="../assets/mvCover.jpg" alt="" />
+              <img :src="item.cover" alt="" />
               <span class="iconfont icon-play"></span>
               <div class="num-wrap">
                 <div class="iconfont icon-play"></div>
-                <div class="num">9912</div>
+                <div class="num">{{item.playCount}}</div>
               </div>
-              <span class="time">02:43</span>
+              <span class="time">{{item.duration}}</span>
             </div>
             <div class="info-wrap">
-              <div class="name">HEYNA</div>
-              <div class="singer">余恩</div>
+              <div class="name">{{item.name}}</div>
+              <div class="singer">{{item.artist}}</div>
             </div>
           </div>
         </div>
@@ -151,6 +140,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'mv',
   data() {
@@ -160,8 +151,94 @@ export default {
       // 页码
       page: 1,
       // 页容量
-      limit: 10
+      limit: 10,
+      url: "",
+      // similar mvs
+      simiMVs: [],
+      mvInfo: {},
+      // avatar of the singer
+      icon: '',
     };
+  },
+  created() {
+    // get the played mv
+    axios({
+      url: "https://autumnfish.cn/mv/url",
+      method:"get",
+      params: {
+        id: this.$route.query.q,
+      },
+    }).then(resp => {
+      // console.log(resp);
+      this.url = resp.data.data.url;
+    });
+
+    // get related mvs
+    axios({
+      url: "https://autumnfish.cn/simi/mv",
+      method: 'get',
+      params: {
+        mvid: this.$route.query.q,
+      }
+    }).then(resp => {
+      this.simiMVs = resp.data.mvs;
+      for (let i = 0; i < this.simiMVs.length; i++) {
+        const element = this.simiMVs[i];
+        let min = parseInt(element.duration/1000/60);
+        if (min < 10) {
+          min  = "0"+min;
+        }
+        let sec = parseInt(element.duration/1000%60);
+        if (sec < 10) {
+          sec = "0"+sec;
+        }
+        element.duration = min+":"+sec;
+
+        // deal wit the playcount
+        if (element.playCount > 100000){
+          element.playCount = parseInt(element.playCount/10000)+"万";
+        }
+      }
+    });
+
+    // get the mv information
+    axios({
+      url: "https://autumnfish.cn/mv/detail",
+      method: "get",
+      params: {
+        mvid: this.$route.query.q,
+      },
+    }).then(resp => {
+      // console.log(resp);
+      this.mvInfo = resp.data.data;
+
+      axios({
+        url: "https://autumnfish.cn/artists",
+        method: "get",
+        params: {
+          id: this.mvInfo.artists[0].id,
+        }
+      }).then(resp => {
+        // console.log(resp);
+        // singer's cover
+        this.icon = resp.data.artist.picUrl;
+      });
+
+    });
+
+    // get the comment
+    axios({
+      url: "https://autumnfish.cn/comment/mv",
+      method: 'get',
+      params: {
+        id: this.$route.query.q,
+        limit: 10,
+        offset: 0,
+      }
+    }).then(resp => {
+      
+      console.log(resp);
+    });
   },
   methods: {
     handleCurrentChange(val) {
